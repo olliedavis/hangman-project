@@ -1,18 +1,21 @@
 class Hangman
-  def  self.introduction
-    puts ""
-    puts "Welcome to my Hangman Game."
-    puts ""
-    puts "The rules are simple:"
-    puts ""
-    puts "The PC will pick a secret word at random"
-    puts "Your job is to decipher what the secret word is by guessing each character one at a time."
-    puts "If you guess incorrectly, you lose one of your 5 lives."
-    puts "If you know want to take a guess at the word, just type 'ANSWER' to enter guessing mode."
-    puts "If you reveal the word without dying, you win!"
+
+  def initialize
+    @guess_count = 0
+    @board = []
   end
 
+  def round
+    pc_guess = word_pick.split("")
+    draw_board(pc_guess.length)
+    guess = gets.chomp.downcase.strip
+    valid?(guess)
+
+  end
+
+
   private
+
   def word_pick
     valid_words = []
     File.foreach("../5desk.txt") do |word|
@@ -22,6 +25,28 @@ class Hangman
     end 
     valid_words[rand(0..valid_words.length)]
   end
+
+  def valid?(guess)
+    if guess.length > 1 and guess != "ANSWER"
+      puts "Invalid - Please try again."
+      try_again
+    else true
+    end
+  end
+
+  def try_again
+    #placeholder
+  end
+
+  def draw_board(int)
+    int.times do 
+      @board.push "_"
+    end
+    puts @board.join("")
+  end
+
 end
 
-Hangman.introduction
+round = Hangman.new
+
+round.game
