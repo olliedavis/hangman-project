@@ -1,6 +1,6 @@
 class Hangman
   private
-  def self.word_pick
+  def word_pick
     valid_words = []
     File.foreach("../5desk.txt") do |word|
       if word.length >= 5 and word.length <= 12
