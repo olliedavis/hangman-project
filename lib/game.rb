@@ -2,7 +2,6 @@ class Hangman
 
   def initialize
     @guess_count = 0
-    @board = []
   end
 
   def round
@@ -39,10 +38,24 @@ class Hangman
   end
 
   def draw_board(int)
+    board = Array.new
     int.times do 
-      @board.push "_"
+      board.push "_"
     end
-    puts @board.join("")
+    board.join("")
+  end
+
+  def introduction
+    puts ""
+    puts "Welcome to my Hangman Game."
+    puts ""
+    puts "The rules are simple:"
+    puts ""
+    puts "The PC will pick a secret word at random"
+    puts "Your job is to decipher what the secret word is by guessing each character one at a time."
+    puts "If you guess incorrectly, you lose one of your 5 lives."
+    puts "If you know want to take a guess at the word, just type 'ANSWER' to enter guessing mode."
+    puts "If you reveal the word without dying, you win!"
   end
 
 end
