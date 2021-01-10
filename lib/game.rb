@@ -1,15 +1,16 @@
 class Hangman
 
   def initialize
-    @guess_count = 0
+    @lives = 5
   end
 
-  def round
-    pc_guess = word_pick.split("")
-    draw_board(pc_guess.length)
+  def round_prep
+    pc_word = word_pick.split("")
+    draw_board(pc_word.length)
     guess = gets.chomp.downcase.strip
+    early_guess?(guess)
     valid?(guess)
-
+    new_letter?(guess)
   end
 
 
@@ -30,6 +31,24 @@ class Hangman
       puts "Invalid - Please try again."
       try_again
     else true
+    end
+  end
+
+  def guess_mode
+    puts "Early guess mode! What do you think the word is? If this was a mistake, please type 'EXIT'"
+    early_guess = gets.chomp.strip
+    if early_guess != "EXIT"
+      if early_guess == pc_word
+        game_over(pc_word, "win")
+      else
+        puts "oof, that's incorrect!"
+        @lives -= 1
+        puts "Total lives left: #{@lives}"
+        puts "Please try again"
+        try_again
+      end
+    else
+      try_again
     end
   end
 
@@ -60,6 +79,67 @@ class Hangman
 
 end
 
-round = Hangman.new
 
-round.game
+def round(guess)
+  used_letters = Array.new
+  used_letters.push guess
+  if pc_word.includes?(guess) do
+    pc_word.each_with_index do |letter, idx|
+      if letter == guess
+        board[idx] = guess
+        next
+      end
+    end
+  else
+    puts "Oh no, the letter doesn't contain #{guess}"
+    @lives -= 1
+    puts "Total lives left: #{@lives}"
+    puts "Please try again"
+    try_again
+  end
+  end
+end
+
+def new_letter?(guess)
+  if !used_letter.includes?(guess)
+    return true
+  else 
+    puts "Oops, you already guessed that letter. Please try again."
+    try_again
+  end
+end
+
+def lives_left?
+  if @lives < 0
+    game_over
+  else
+    return true
+  end
+end
+
+def game_over(answer, result)
+  if result == "loss"
+    puts "GAME OVER - You died! The correct word was #{answer}!"
+  end
+  
+  if result == "win"
+    puts "Congratulations! You guess the correct word with #{@lives} lives left."
+  end
+
+  puts "Would you like to play again? Press 1 for yes, or press 2 to exit"
+  response = gets.chomp.strip.to_i
+  if response == 1
+    Hangman.play
+  else
+    exit
+  end
+end
+
+def early_guess?
+  if guess == "ANSWER"
+    guess_mode
+  end
+end
+
+
+
