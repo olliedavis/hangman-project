@@ -5,7 +5,7 @@ class Hangman
     @board = Array.new
     
   end
-  def self.start
+  def start
     introduction
     word_pick
     draw_board(@pc_word.length)
@@ -13,30 +13,32 @@ class Hangman
     round_prep
   end
 
-  def self.round_prep
-    @guess = gets.chomp.downcase.strip
+  def round_prep
+    @guess = gets.chomp.downcase
     early_guess?
     valid?
     new_letter?
     round
   end
 
-  def self.word_pick
+  def word_pick
     valid_words = []
-    File.foreach('5desk.txt') do |word|
+    File.foreach('../5desk.txt') do |word|
       valid_words.push word if (word.length >= 5) && (word.length <= 12)
     end
-    @pc_word = valid_words[rand(0..valid_words.length)]
+    @pc_word = valid_words[rand(0..valid_words.length)].downcase
+    @pc_word = @pc_word.split("")
+    puts @pc_word
   end
 
-  def self.valid?
+  def valid?
     if @guess.length > 1
       puts 'Invalid - Please try again.'
       try_again
     end
   end
 
-  def self.guess_mode
+  def guess_mode
     puts "Early guess mode! What do you think the word is? If this was a mistake, please type 'EXIT'"
     early_guess = gets.chomp.strip
     if early_guess != 'EXIT'
@@ -54,19 +56,19 @@ class Hangman
     end
   end
 
-  def self.try_again
+  def try_again
     round_prep if lives_left? == true
   end
 
-  def self.draw_board(int)
+  def draw_board(int)
     @board = []
-    int.times do
+    (int - 1).times do
       @board.push '_'
     end
     @board.join('')
   end
 
-  def self.introduction
+  def introduction
     puts ''
     puts 'Welcome to my Hangman Game.'
     puts ''
@@ -81,22 +83,25 @@ class Hangman
     puts 'Please enter your first letter guess:'
   end
 
-  def self.round
+  def round
     @used_letters.push @guess
     if @pc_word.include?(@guess)
       @pc_word.each_with_index do |letter, idx|
-        @board[idx] = @guess if letter == @guess
+        if letter == @guess
+          @board[idx] = @guess
+        end
       end
     else
-      puts "Oh no, the letter doesn't contain #{@guess}"
+      puts "Oh no, the word doesn't contain #{@guess}"
       @lives -= 1
       puts "Total lives left: #{@lives}"
       puts 'Please try again'
-      try_again
     end
+    puts @board.join
+    try_again
   end
 
-  def self.new_letter?
+  def new_letter?
     if @used_letters.include?(@guess)
       puts 'Oops, you already guessed that letter. Please try again.'
       try_again
@@ -105,16 +110,16 @@ class Hangman
     end
   end
 
-  def self.lives_left?
-    if @lives.negative?
+  def lives_left?
+    if @lives < 0
       game_over
     else
       true
     end
   end
 
-  def self.game_over(answer, result)
-    puts "GAME OVER - You died! The correct word was #{answer}!" if result == 'loss'
+  def game_over(result)
+    puts "GAME OVER - You died! The correct word was #{@pc_word.join("")}!" if result == 'loss'
 
     puts "Congratulations! You guess the correct word with #{@lives} lives left." if result == 'win'
 
@@ -127,11 +132,13 @@ class Hangman
     end
   end
 
-  def self.early_guess?
+  def early_guess?
     if @guess == 'ANSWER'
       guess_mode
     end
   end
 end
 
-Hangman.start
+player1 = Hangman.new
+
+player1.start
