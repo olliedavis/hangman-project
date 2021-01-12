@@ -3,13 +3,14 @@ class Hangman
     @lives = 5
     @used_letters = []
     @board = []
+    @correct_count = 0
   end
 
   def start
     introduction
     word_pick
     draw_board(@pc_word.length)
-    puts @board.join("")
+    puts @board.join('')
     round_prep
   end
 
@@ -27,7 +28,7 @@ class Hangman
       valid_words.push word if (word.length >= 5) && (word.length <= 12)
     end
     @pc_word = valid_words[rand(0..valid_words.length)].downcase
-    @pc_word = @pc_word.split("")
+    @pc_word = @pc_word.split('')
     puts @pc_word
   end
 
@@ -41,18 +42,15 @@ class Hangman
   def guess_mode
     puts "Early guess mode! What do you think the word is? If this was a mistake, please type 'EXIT EARLY MODE'"
     early_guess = gets.chomp.strip.downcase
-    if early_guess != 'EXIT EARLY MODE'
+    if early_guess != 'exit early mode'
       if early_guess == @pc_word.join('')
         game_over(@pc_word, 'win')
       else
-        puts "oof, that's incorrect!"
-        @lives -= 1
-        puts "Total lives left: #{@lives}"
-        puts 'Please try again'
-        try_again
+        lives_lost
       end
     else
       puts 'Exiting early mode..'
+      puts 'Please enter your next guess'
       try_again
     end
   end
@@ -90,17 +88,14 @@ class Hangman
       @pc_word.each_with_index do |letter, idx|
         if letter == @guess
           @board[idx] = @guess
-          puts "Correct! The word does contain '#{@guess}'"
-          won?
+          @correct_count += 1
         end
       end
     else
-      puts "Oh no, the word doesn't contain #{@guess}"
-      @lives -= 1
-      puts "Total lives left: #{@lives}"
-      puts 'Please try again'
+      lives_lost
     end
-    puts @board.join
+    board_update(@correct_count)
+    won?
     try_again
   end
 
@@ -134,7 +129,23 @@ class Hangman
   end
 
   def won?
-    game_over('win') unless @pc_word.include?('_')
+    game_over('win') unless @board.include?('_')
+  end
+
+  def board_update(count)
+    if count > 0
+      puts "Correct! There are #{count} #{@guess}'s."
+      @correct_count = 0
+    end
+    puts @board.join
+  end
+
+  def lives_lost
+    puts "oof, that's incorrect!"
+    @lives -= 1
+    puts "Total lives left: #{@lives}"
+    puts 'Please try again'
+    try_again
   end
 end
 
