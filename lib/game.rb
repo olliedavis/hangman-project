@@ -117,7 +117,7 @@ class Hangman
   end
 
   def game_over(result)
-    puts "GAME OVER - You died! The correct word was #{@pc_word.join("")}!" if result == 'loss'
+    puts "GAME OVER - You died! The correct word was #{@pc_word.join("")}" if result == 'loss'
     puts "Congratulations! You guess the correct word with #{@lives} lives left." if result == 'win'
     exit
   end
