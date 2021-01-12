@@ -1,10 +1,10 @@
 class Hangman
   def initialize
     @lives = 5
-    @used_letters = Array.new
-    @board = Array.new
-    
+    @used_letters = []
+    @board = []
   end
+
   def start
     introduction
     word_pick
@@ -32,16 +32,16 @@ class Hangman
   end
 
   def valid?
-    if @guess.length > 1
+    if @guess.length > 1 && @guess != 'answermode'
       puts 'Invalid - Please try again.'
       try_again
     end
   end
 
   def guess_mode
-    puts "Early guess mode! What do you think the word is? If this was a mistake, please type 'EXIT'"
-    early_guess = gets.chomp.strip
-    if early_guess != 'EXIT'
+    puts "Early guess mode! What do you think the word is? If this was a mistake, please type 'EXIT EARLY MODE'"
+    early_guess = gets.chomp.strip.downcase
+    if early_guess != 'EXIT EARLY MODE'
       if early_guess == @pc_word.join('')
         game_over(@pc_word, 'win')
       else
@@ -52,6 +52,7 @@ class Hangman
         try_again
       end
     else
+      puts 'Exiting early mode..'
       try_again
     end
   end
@@ -77,7 +78,7 @@ class Hangman
     puts 'The PC will pick a secret word at random'
     puts 'Your job is to decipher what the secret word is by guessing each character one at a time.'
     puts 'If you guess incorrectly, you lose one of your 5 lives.'
-    puts "If you know want to take a guess at the word, just type 'ANSWER' to enter guessing mode."
+    puts "If you know want to take a guess at the word, just type 'ANSWER MODE' to enter early answer guessing mode."
     puts 'If you reveal the word without dying, you win!'
     puts ''
     puts 'Please enter your first letter guess:'
@@ -89,6 +90,8 @@ class Hangman
       @pc_word.each_with_index do |letter, idx|
         if letter == @guess
           @board[idx] = @guess
+          puts "Correct! The word does contain '#{@guess}'"
+          won?
         end
       end
     else
@@ -112,7 +115,7 @@ class Hangman
 
   def lives_left?
     if @lives < 0
-      game_over
+      game_over('loss')
     else
       true
     end
@@ -120,22 +123,18 @@ class Hangman
 
   def game_over(result)
     puts "GAME OVER - You died! The correct word was #{@pc_word.join("")}!" if result == 'loss'
-
     puts "Congratulations! You guess the correct word with #{@lives} lives left." if result == 'win'
-
-    puts 'Would you like to play again? Press 1 yes, or press 2 to exit'
-    response = gets.chomp.strip.to_i
-    if response == 1
-      Hangman.play
-    else
-      exit
-    end
+    exit
   end
 
   def early_guess?
-    if @guess == 'ANSWER'
+    if @guess == 'answer mode'
       guess_mode
     end
+  end
+
+  def won?
+    game_over('win') unless @pc_word.include?('_')
   end
 end
 
