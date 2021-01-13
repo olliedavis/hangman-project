@@ -14,6 +14,8 @@ class Hangman
     round_prep
   end
 
+  private
+
   def round_prep
     @guess = gets.chomp.downcase
     valid?
@@ -23,7 +25,7 @@ class Hangman
 
   def word_pick
     valid_words = []
-    File.foreach('5desk.txt') do |word|
+    File.foreach('../5desk.txt') do |word|
       valid_words.push word if (word.length >= 5) && (word.length <= 12)
     end
     @pc_word = valid_words[rand(0..valid_words.length)].downcase
