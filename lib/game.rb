@@ -1,9 +1,14 @@
+require_relative 'hangman_save'
+require 'json'
+
 class Hangman
   def initialize
     @lives = 5
     @used_letters = []
     @board = []
     @correct_count = 0
+    @used_letters = []
+    @save_name = 'testing'
   end
 
   def start
@@ -11,6 +16,7 @@ class Hangman
     word_pick
     draw_board(@pc_word.length)
     puts @board.join('')
+    Save.new(@save_name, @pc_word.join.chomp, @lives, @used_letters, @board.join)
     round_prep
   end
 
