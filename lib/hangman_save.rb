@@ -17,8 +17,12 @@ class Save
       used_letters: @used_letters,
       board: @board
     }.to_json
-    open("#{save_name}.json", 'a') do |file|
+    open("../saves/#{save_name}.json", 'a') do |file|
       file.puts self_json
     end
   end
 end
+
+
+
+

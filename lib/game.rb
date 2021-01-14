@@ -7,22 +7,27 @@ class Hangman
     @board = []
     @correct_count = 0
     @used_letters = []
+    @divider = "----------------------------------------"
+
   end
 
   def start
     introduction
     word_pick
     draw_board(@pc_word.length)
-    puts @board.join('')
+    puts @board.join('') + "  < This is your current board"
     round_prep
   end
 
   private
 
   def round_prep
+    puts @divider
     puts 'Please enter your guess:'
+    puts @divider
     @guess = gets.chomp.downcase
     valid?
+    load?
     save?
     new_letter?
     round
@@ -41,7 +46,9 @@ class Hangman
 
   def valid?
     if @guess.length > 1
+      puts @divider
       puts 'Invalid - Please try again.'
+      puts @divider
       try_again
     end
   end
@@ -59,6 +66,7 @@ class Hangman
   end
 
   def introduction
+    puts @divider
     puts 'Welcome to my Hangman Game.'
     puts ''
     puts 'The rules are simple:'
@@ -66,7 +74,8 @@ class Hangman
     puts 'Your job is to decipher what the secret word is by guessing each character one at a time.'
     puts 'If you guess incorrectly, you lose one of your 5 lives.'
     puts 'If you reveal the word without dying, you win!'
-    puts ''
+    puts 'Enter 1 at anytime to save your game, or press 2 to load a previously saved game'
+    puts @divider
   end
 
   def round
@@ -83,6 +92,7 @@ class Hangman
 
   def new_letter?
     if @used_letters.include?(@guess)
+      puts @divider
       puts 'Oops, you already guessed that letter. Please try again.'
       try_again
     else
@@ -111,32 +121,67 @@ class Hangman
 
   def board_update(count)
     if count.positive?
+      puts @divider
       puts "Correct! There are #{count} #{@guess}'s."
       @correct_count = 0
     end
-    puts @board.join
+    puts @divider
+    puts @board.join + "  < This is your current board"
   end
 
   def lives_lost
+    puts @divider
     puts 'oof, that is incorrect!'
-    puts ''
     @lives -= 1
+    lives_left?
     puts "Total lives left: #{@lives}"
-    puts ''
     puts 'Try another letter?'
     try_again
   end
 
   def save?
     if @guess == '1'
+      puts @divider
       puts 'Please enter a name for your save file'
+      puts @divider
       save_name = gets.chomp
+      puts @divider
       puts "Game saved as '#{save_name}'"
       Save.new(save_name, @pc_word, @lives, @used_letters, @board)
       round_prep
     else
       false
     end
+  end
+
+  def load?
+    if @guess == '2'
+      begin
+        puts @divider
+        retrieve_files
+        puts @divider
+        user_save = gets.chomp
+        file = File.read("../saves/#{user_save}.json")
+      rescue
+        puts @divider
+        puts "File not found. Going back to main menu."
+        round_prep
+      end
+        contents = JSON.load(file)
+        contents
+        puts "Game loaded! Here's a reminder of where you left off"
+        puts "Current Board: #{@board.join}, Lives Left: #{@lives}, Used Letters: #{@used_letters}" 
+        round_prep
+    end
+  end
+
+  def retrieve_files
+    saves = Dir.entries("../saves/")
+    saves.each do |save_file|
+      puts File.basename(save_file, '.json')
+    end
+    puts @divider
+    puts 'Which one is the name of your save file?'
   end
 end
 
