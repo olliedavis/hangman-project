@@ -104,10 +104,6 @@ class Hangman
     exit
   end
 
-  def early_guess?
-    guess_mode if @guess == 'answer mode'
-  end
-
   def won?
     game_over('win') unless @board.include?('_')
   end
