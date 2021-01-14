@@ -1,5 +1,4 @@
 require_relative 'hangman_save'
-require 'json'
 
 class Hangman
   def initialize
@@ -8,7 +7,6 @@ class Hangman
     @board = []
     @correct_count = 0
     @used_letters = []
-    @save_name = 'testing'
   end
 
   def start
@@ -16,7 +14,6 @@ class Hangman
     word_pick
     draw_board(@pc_word.length)
     puts @board.join('')
-    Save.new(@save_name, @pc_word.join.chomp, @lives, @used_letters, @board.join)
     round_prep
   end
 
@@ -35,7 +32,7 @@ class Hangman
       valid_words.push word if (word.length >= 5) && (word.length <= 12)
     end
     @pc_word = valid_words[rand(0..valid_words.length)].downcase
-    @pc_word = @pc_word.split('')
+    @pc_word = @pc_word.chomp.split('')
   end
 
   def valid?
@@ -51,7 +48,7 @@ class Hangman
 
   def draw_board(int)
     @board = []
-    (int - 1).times do
+    int.times do
       @board.push '_'
     end
     @board.join('')
@@ -71,16 +68,13 @@ class Hangman
 
   def round
     @used_letters.push @guess
-    if @pc_word.include?(@guess)
+    lives_lost unless @pc_word.include?(@guess)
       @pc_word.each_with_index do |letter, idx|
         if letter == @guess
           @board[idx] = @guess
           @correct_count += 1
         end
       end
-    else
-      lives_lost
-    end
     board_update(@correct_count)
     won?
     try_again
@@ -111,9 +105,7 @@ class Hangman
   end
 
   def early_guess?
-    if @guess == 'answer mode'
-      guess_mode
-    end
+    guess_mode if @guess == 'answer mode'
   end
 
   def won?
@@ -129,7 +121,7 @@ class Hangman
   end
 
   def lives_lost
-    puts "oof, that's incorrect!"
+    puts 'oof, that is incorrect!'
     puts ''
     @lives -= 1
     puts "Total lives left: #{@lives}"
@@ -137,6 +129,14 @@ class Hangman
     puts 'Try another letter?'
     try_again
   end
+
+  def save
+    puts 'Please enter a name for your save file'
+    save_name = gets.chomp
+    puts "Game saved as '#{save_name}'" 
+    Save.new(save_name, @pc_word, @lives, @used_letters, @board)
+  end
+
 end
 
 player1 = Hangman.new
