@@ -13,10 +13,9 @@ class Save
   def save_game(save_name)
     self_json = {
       pc_word: @pc_word,
-      lives_left: @lives_left,
-      letters_used: @letters_used,
-      board: @board,
-      correct_count: @correct_count
+      lives: @lives,
+      used_letters: @used_letters,
+      board: @board
     }.to_json
     open("#{save_name}.json", 'a') do |file|
       file.puts self_json

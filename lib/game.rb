@@ -20,8 +20,10 @@ class Hangman
   private
 
   def round_prep
+    puts 'Please enter your guess:'
     @guess = gets.chomp.downcase
     valid?
+    save?
     new_letter?
     round
     won?
@@ -65,7 +67,6 @@ class Hangman
     puts 'If you guess incorrectly, you lose one of your 5 lives.'
     puts 'If you reveal the word without dying, you win!'
     puts ''
-    puts 'Please enter your first letter guess:'
   end
 
   def round
@@ -126,11 +127,16 @@ class Hangman
     try_again
   end
 
-  def save
-    puts 'Please enter a name for your save file'
-    save_name = gets.chomp
-    puts "Game saved as '#{save_name}'"
-    Save.new(save_name, @pc_word, @lives, @used_letters, @board)
+  def save?
+    if @guess == '1'
+      puts 'Please enter a name for your save file'
+      save_name = gets.chomp
+      puts "Game saved as '#{save_name}'"
+      Save.new(save_name, @pc_word, @lives, @used_letters, @board)
+      round_prep
+    else
+      false
+    end
   end
 end
 
