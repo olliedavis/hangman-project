@@ -24,6 +24,8 @@ class Hangman
     valid?
     new_letter?
     round
+    won?
+    try_again
   end
 
   def word_pick
@@ -69,15 +71,13 @@ class Hangman
   def round
     @used_letters.push @guess
     lives_lost unless @pc_word.include?(@guess)
-      @pc_word.each_with_index do |letter, idx|
-        if letter == @guess
-          @board[idx] = @guess
-          @correct_count += 1
-        end
+    @pc_word.each_with_index do |letter, idx|
+      if letter == @guess
+        @board[idx] = @guess
+        @correct_count += 1
       end
+    end
     board_update(@correct_count)
-    won?
-    try_again
   end
 
   def new_letter?
@@ -90,7 +90,7 @@ class Hangman
   end
 
   def lives_left?
-    if @lives < 0
+    if @lives.negative?
       game_over('loss')
       exit
     else
@@ -99,7 +99,7 @@ class Hangman
   end
 
   def game_over(result)
-    puts "GAME OVER - You died! The correct word was #{@pc_word.join("")}" if result == 'loss'
+    puts "GAME OVER - You died! The correct word was #{@pc_word.join('')}" if result == 'loss'
     puts "Congratulations! You guess the correct word with #{@lives} lives left." if result == 'win'
     exit
   end
@@ -113,7 +113,7 @@ class Hangman
   end
 
   def board_update(count)
-    if count > 0
+    if count.positive?
       puts "Correct! There are #{count} #{@guess}'s."
       @correct_count = 0
     end
@@ -133,10 +133,9 @@ class Hangman
   def save
     puts 'Please enter a name for your save file'
     save_name = gets.chomp
-    puts "Game saved as '#{save_name}'" 
+    puts "Game saved as '#{save_name}'"
     Save.new(save_name, @pc_word, @lives, @used_letters, @board)
   end
-
 end
 
 player1 = Hangman.new
