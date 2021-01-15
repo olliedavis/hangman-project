@@ -7,15 +7,14 @@ class Hangman
     @board = []
     @correct_count = 0
     @used_letters = []
-    @divider = "----------------------------------------"
-
+    @divider = '----------------------------------------'
   end
 
   def start
     introduction
     word_pick
     draw_board(@pc_word.length)
-    puts @board.join('') + "  < This is your current board"
+    puts @board.join('') + '  < This is your current board'
     round_prep
   end
 
@@ -45,12 +44,11 @@ class Hangman
   end
 
   def valid?
-    if @guess.length > 1
-      puts @divider
-      puts 'Invalid - Please try again.'
-      puts @divider
-      try_again
-    end
+    return unless @guess.length > 1
+    puts @divider
+    puts 'Invalid - Please try again.'
+    puts @divider
+    try_again
   end
 
   def try_again
@@ -126,7 +124,7 @@ class Hangman
       @correct_count = 0
     end
     puts @divider
-    puts @board.join + "  < This is your current board"
+    puts @board.join + '  < This is your current board'
   end
 
   def lives_lost
@@ -145,6 +143,7 @@ class Hangman
       puts 'Please enter a name for your save file'
       puts @divider
       save_name = gets.chomp
+      unique_file_name?(save_name)
       puts @divider
       puts "Game saved as '#{save_name}'"
       Save.new(save_name, @pc_word, @lives, @used_letters, @board)
@@ -162,26 +161,36 @@ class Hangman
         puts @divider
         user_save = gets.chomp
         file = File.read("../saves/#{user_save}.json")
-      rescue
+      rescue StandardError
         puts @divider
-        puts "File not found. Going back to main menu."
+        puts 'File not found. Going back to main menu.'
         round_prep
       end
-        contents = JSON.load(file)
-        contents
-        puts "Game loaded! Here's a reminder of where you left off"
-        puts "Current Board: #{@board.join}, Lives Left: #{@lives}, Used Letters: #{@used_letters}" 
-        round_prep
+      contents = JSON.load(file)
+      contents
+      puts "Game loaded! Here's a reminder of where you left off"
+      puts "Current Board: #{@board.join}, Lives Left: #{@lives}, Used Letters: #{@used_letters}"
+      round_prep
     end
   end
 
   def retrieve_files
-    saves = Dir.entries("../saves/")
+    saves = Dir.entries('../saves/')
     saves.each do |save_file|
       puts File.basename(save_file, '.json')
     end
     puts @divider
     puts 'Which one is the name of your save file?'
+  end
+
+  def unique_file_name?(save_name)
+    @saves = Dir.entries('../saves/')
+    @saves.each do |save|
+      next unless save == save_name + '.json'
+      puts 'File name already exists'
+      puts 'Returning to game'
+      puts round_prep
+    end
   end
 end
 
