@@ -26,8 +26,8 @@ class Hangman
     puts @divider
     @guess = gets.chomp.downcase
     valid?
-    load?
     save?
+    load?
     new_letter?
     round
     won?
@@ -45,6 +45,7 @@ class Hangman
 
   def valid?
     return unless @guess.length > 1
+
     puts @divider
     puts 'Invalid - Please try again.'
     puts @divider
@@ -63,19 +64,6 @@ class Hangman
     @board.join('')
   end
 
-  def introduction
-    puts @divider
-    puts 'Welcome to my Hangman Game.'
-    puts ''
-    puts 'The rules are simple:'
-    puts 'The PC will pick a secret word at random'
-    puts 'Your job is to decipher what the secret word is by guessing each character one at a time.'
-    puts 'If you guess incorrectly, you lose one of your 5 lives.'
-    puts 'If you reveal the word without dying, you win!'
-    puts 'Enter 1 at anytime to save your game, or press 2 to load a previously saved game'
-    puts @divider
-  end
-
   def round
     @used_letters.push @guess
     lives_lost unless @pc_word.include?(@guess)
@@ -89,22 +77,17 @@ class Hangman
   end
 
   def new_letter?
-    if @used_letters.include?(@guess)
-      puts @divider
-      puts 'Oops, you already guessed that letter. Please try again.'
-      try_again
-    else
-      true
-    end
+    return true unless @used_letters.include?(@guess)
+
+    puts @divider
+    puts 'Oops, you already guessed that letter. Please try again.'
+    try_again
   end
 
   def lives_left?
-    if @lives.negative?
-      game_over('loss')
-      exit
-    else
-      true
-    end
+    return true unless @lives.negative?
+
+    game_over('loss')
   end
 
   def game_over(result)
@@ -154,30 +137,30 @@ class Hangman
   end
 
   def load?
-    if @guess == '2'
-      begin
-        puts @divider
-        retrieve_files
-        puts @divider
-        user_save = gets.chomp
-        file = File.read("../saves/#{user_save}.json")
-      rescue StandardError
-        puts @divider
-        puts 'File not found. Going back to main menu.'
-        round_prep
-      end
-      contents = JSON.load(file)
-      contents
-      puts "Game loaded! Here's a reminder of where you left off"
-      puts "Current Board: #{@board.join}, Lives Left: #{@lives}, Used Letters: #{@used_letters}"
+    return unless @guess == '2'
+
+    begin
+      puts @divider
+      retrieve_files
+      puts @divider
+      user_save = gets.chomp
+      save = File.read("../saves/#{user_save}.json")
+    rescue StandardError
+      puts @divider
+      puts 'File not found. Going back to main menu.'
       round_prep
     end
+    content = JSON.parse(save)
+    load_save(content)
+    puts "Game loaded! Here's a reminder of where you left off"
+    puts "Current Board: #{@board.join}, Lives Left: #{@lives}, Used Letters: #{@used_letters}"
+    round_prep
   end
 
   def retrieve_files
     saves = Dir.entries('../saves/')
     saves.each do |save_file|
-      puts File.basename(save_file, '.json')
+      puts File.basename(save_file, '.json') unless save_file =~ /^..?$/
     end
     puts @divider
     puts 'Which one is the name of your save file?'
@@ -187,10 +170,31 @@ class Hangman
     @saves = Dir.entries('../saves/')
     @saves.each do |save|
       next unless save == save_name + '.json'
+
       puts 'File name already exists'
       puts 'Returning to game'
       puts round_prep
     end
+  end
+
+  def load_save(content)
+    @pc_word = content['pc_word']
+    @lives = content['lives']
+    @used_letters = content['used_letters']
+    @board = content['board']
+  end
+
+  def introduction
+    puts @divider
+    puts 'Welcome to my Hangman Game.'
+    puts ''
+    puts 'The rules are simple:'
+    puts 'The PC will pick a secret word at random'
+    puts 'Your job is to decipher what the secret word is by guessing each character one at a time.'
+    puts 'If you guess incorrectly, you lose one of your 5 lives.'
+    puts 'If you reveal the word without dying, you win!'
+    puts 'Enter 1 at anytime to save your game, or press 2 to load a previously saved game'
+    puts @divider
   end
 end
 
